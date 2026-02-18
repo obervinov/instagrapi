@@ -3,7 +3,7 @@ import random
 import shutil
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -43,7 +43,9 @@ class DownloadPhotoMixin:
     Helpers for downloading photo
     """
 
-    def photo_download(self, media_pk: int, folder: Path = "") -> Path:
+    def photo_download(
+        self, media_pk: int, folder: Path = "", media: Optional[Media] = None
+    ) -> Path:
         """
         Download photo using media pk
 
@@ -54,13 +56,18 @@ class DownloadPhotoMixin:
         folder: Path, optional
             Directory in which you want to download the photo, default is "" and will download the files to working
                 directory
+        media: Media, optional
+            Pre-fetched media object to avoid extra request
 
         Returns
         -------
         Path
             Path for the file downloaded
         """
-        media = self.media_info_v1(media_pk)
+        if media is None:
+            media = self.media_info_v1(media_pk)
+        else:
+            media_pk = media.pk
         assert media.media_type == 1, "Must been photo"
         filename = "{username}_{media_pk}".format(
             username=media.user.username, media_pk=media_pk
@@ -92,7 +99,18 @@ class DownloadPhotoMixin:
         fname = urlparse(url).path.rsplit("/", 1)[1]
         filename = "%s.%s" % (filename, fname.rsplit(".", 1)[1]) if filename else fname
         path = Path(folder) / filename
-        response = self.private.get(url, stream=True, timeout=self.request_timeout)
+        # CDN URLs should preserve Host header, but still use configured proxy if available
+        response = requests.get(
+            url,
+            stream=True,
+            timeout=self.request_timeout,
+            proxies=self.private.proxies,
+            headers={
+                "User-Agent": self.user_agent,
+                "Accept": "*/*",
+                "Accept-Language": self.private.headers.get("Accept-Language", "en-US,en;q=0.9"),
+            },
+        )
         response.raise_for_status()
         with open(path, "wb") as f:
             response.raw.decode_content = True
@@ -113,7 +131,18 @@ class DownloadPhotoMixin:
         bytes
         """
         url = str(url)
-        response = self.private.get(url, stream=True, timeout=self.request_timeout)
+        # CDN URLs should preserve Host header, but still use configured proxy if available
+        response = requests.get(
+            url,
+            stream=True,
+            timeout=self.request_timeout,
+            proxies=self.private.proxies,
+            headers={
+                "User-Agent": self.user_agent,
+                "Accept": "*/*",
+                "Accept-Language": self.private.headers.get("Accept-Language", "en-US,en;q=0.9"),
+            },
+        )
         response.raise_for_status()
         response.raw.decode_content = True
         return response.content

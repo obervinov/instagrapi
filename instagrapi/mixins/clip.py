@@ -23,7 +23,7 @@ class DownloadClipMixin:
     Helpers to download CLIP videos
     """
 
-    def clip_download(self, media_pk: int, folder: Path = "") -> str:
+    def clip_download(self, media_pk: int, folder: Path = "", media = None) -> str:
         """
         Download CLIP video
 
@@ -35,12 +35,14 @@ class DownloadClipMixin:
             Directory in which you want to download the album,
             default is "" and will download the files to working
             directory.
+        media: Media, optional
+            Pre-fetched media object to avoid extra request
 
         Returns
         -------
         str
         """
-        return self.video_download(media_pk, folder)
+        return self.video_download(media_pk, folder, media=media)
 
     def clip_download_by_url(
         self, url: str, filename: str = "", folder: Path = ""
