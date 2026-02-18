@@ -94,7 +94,15 @@ class DownloadVideoMixin:
         path = Path(folder) / filename
         # CDN URLs should preserve Host header, but still use configured proxy if available
         response = requests.get(
-            url, stream=True, timeout=self.request_timeout, proxies=self.private.proxies
+            url,
+            stream=True,
+            timeout=self.request_timeout,
+            proxies=self.private.proxies,
+            headers={
+                "User-Agent": self.user_agent,
+                "Accept": "*/*",
+                "Accept-Language": self.private.headers.get("Accept-Language", "en-US,en;q=0.9"),
+            },
         )
         response.raise_for_status()
         try:
@@ -137,7 +145,15 @@ class DownloadVideoMixin:
         """
         # CDN URLs should preserve Host header, but still use configured proxy if available
         response = requests.get(
-            url, stream=True, timeout=self.request_timeout, proxies=self.private.proxies
+            url,
+            stream=True,
+            timeout=self.request_timeout,
+            proxies=self.private.proxies,
+            headers={
+                "User-Agent": self.user_agent,
+                "Accept": "*/*",
+                "Accept-Language": self.private.headers.get("Accept-Language", "en-US,en;q=0.9"),
+            },
         )
         response.raise_for_status()
         content_length = int(response.headers.get("Content-Length"))
