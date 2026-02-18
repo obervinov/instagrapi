@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 from instagrapi.exceptions import (
@@ -18,7 +18,9 @@ class DownloadAlbumMixin:
     Helper class to download album
     """
 
-    def album_download(self, media_pk: int, folder: Path = "") -> List[Path]:
+    def album_download(
+        self, media_pk: int, folder: Path = "", media: Optional[Media] = None
+    ) -> List[Path]:
         """
         Download your album
 
@@ -29,13 +31,18 @@ class DownloadAlbumMixin:
         folder: Path, optional
             Directory in which you want to download the album, default is ""
             and will download the files to working directory.
+        media: Media, optional
+            Pre-fetched media object to avoid extra request
 
         Returns
         -------
         List[Path]
             List of path for all the files downloaded
         """
-        media = self.media_info_v1(media_pk)
+        if media is None:
+            media = self.media_info_v1(media_pk)
+        else:
+            media_pk = media.pk
         assert media.media_type == 8, "Must been album"
         paths = []
         for resource in media.resources:
@@ -82,7 +89,9 @@ class DownloadAlbumMixin:
                 raise AlbumUnknownFormat()
         return paths
 
-    def album_download_origin(self, media_pk: int) -> List[bytes]:
+    def album_download_origin(
+        self, media_pk: int, media: Optional[Media] = None
+    ) -> List[bytes]:
         """
         Download your album
 
@@ -90,12 +99,17 @@ class DownloadAlbumMixin:
         ----------
         media_pk: int
             PK for the album you want to download
+        media: Media, optional
+            Pre-fetched media object to avoid extra request
         Returns
         -------
         List[Path]
             List of path for all the files downloaded
         """
-        media = self.media_info_v1(media_pk)
+        if media is None:
+            media = self.media_info_v1(media_pk)
+        else:
+            media_pk = media.pk
         assert media.media_type == 8, "Must been album"
         files = []
         for resource in media.resources:
