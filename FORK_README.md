@@ -11,7 +11,7 @@ Update your `pyproject.toml`:
 ```toml
 [tool.poetry.dependencies]
 # Use the fork with fixes
-instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.1" }
+instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.2" }
 ```
 
 ---
