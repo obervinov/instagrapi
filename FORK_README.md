@@ -11,7 +11,7 @@ Update your `pyproject.toml`:
 ```toml
 [tool.poetry.dependencies]
 # Use the fork with fixes
-instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.1" }
+instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.2" }
 ```
 
 ---
@@ -24,7 +24,7 @@ instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.
 - **User-Agent Consistency:** Eliminates Safari/Android mixing that triggers detection
 - **No 401 Errors:** Removes suspicious web requests that cause "Please wait few minutes" blocks
 
-### 🐛 Bug Fixes (Version 2.2.1)
+### 🐛 Bug Fixes (v2.2.1)
 - **Issue #2254:** `clips_metadata.original_sound_info` validation error fixed
 - **Issue #2257:** `image_versions2.candidates.scans_profile` missing field error fixed
 - **Issue #2257:** `pinned_channels_info` KeyError for private accounts fixed
@@ -32,7 +32,7 @@ instagrapi = { git = "https://github.com/obervinov/instagrapi.git", tag = "v2.2.
 ### 📊 Proxy Routing
 All these now use authenticated session with proxy:
 - ✅ `video_download()`
-- ✅ `photo_download()`  
+- ✅ `photo_download()`
 - ✅ `album_download()`
 - ✅ `track_download()`
 - ✅ `direct_threads()`
@@ -42,20 +42,14 @@ All these now use authenticated session with proxy:
 
 ---
 
-## Branch Details
+## Where the work lives
 
-### `fix/security-and-proxy`
+All of it is on `master` — the `fix/security-and-proxy` branch it arrived on was merged
+and deleted. Tag `v2.2.0` is the fork point from upstream; everything since is in
+[CHANGELOG.md](CHANGELOG.md):
 
-Two commits on top of upstream master:
-
-1. **Pydantic validation fixes** (686a353)
-   - Makes `scans_profile` optional
-   - Adds defensive check for `pinned_channels_info`
-
-2. **Security & Proxy implementation** (841e9d1)
-   - Reverse API priority (private first)
-   - Replace `requests.get()` with `self.private.get()`
-   - Use private API in all download methods
+- **v2.2.1** — the security, proxy and Pydantic fixes listed above
+- **v2.2.2** — CI only, reusable workflows moved to `obervinov/_templates@v4.0.0`
 
 ---
 
@@ -86,7 +80,7 @@ cl.login(username, password)
 
 # These should all work without ValidationErrors
 threads = cl.direct_threads()
-medias = cl.hashtag_medias_top("test", 10)  
+medias = cl.hashtag_medias_top("test", 10)
 user_medias = cl.user_medias_v1(user_id, 10)
 
 # Check proxy logs - all requests should appear there
